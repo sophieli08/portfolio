@@ -30,9 +30,8 @@
 
 .progress-pct {
   min-width: 3ch;
-  font-size: 12px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;  /* digits don't jiggle while counting */
+  font-size: var(--text);
+  font-variant-numeric: lining-nums tabular-nums;  /* digits don't jiggle while counting */
   text-align: right;
 }
 
