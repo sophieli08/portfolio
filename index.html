@@ -16,10 +16,69 @@
     main {
       flex: 1;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      gap: 16px;
     }
     main img { width: 100%; height: auto; display: block; }
+    .replay {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 40px;
+      font-family: "SF Pro Text", "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      font-style: italic;
+      text-transform: lowercase;
+      color: var(--logo);
+      background: none;
+      border: none;
+      padding: 6px 12px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .replay:hover { color: var(--logo-hover); }
+    .replay svg {
+      width: 15px;
+      height: 15px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .replay.spin svg { animation: spin 0.5s ease; }
+    @keyframes spin { to { transform: rotate(-360deg); } }
+
+    /* custom cursor: a small dot that trails the mouse and swells over clickable things */
+    .cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 12px;
+      height: 12px;
+      margin: -6px 0 0 -6px;
+      border-radius: 50%;
+      background: var(--logo);
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0;
+      transition: width 0.25s ease, height 0.25s ease, margin 0.25s ease,
+                  opacity 0.25s ease, background-color 0.25s ease;
+    }
+    .cursor.visible { opacity: 1; }
+    .cursor.hover {
+      width: 40px;
+      height: 40px;
+      margin: -20px 0 0 -20px;
+      opacity: 0.35;
+    }
+    .cursor.down { width: 8px; height: 8px; margin: -4px 0 0 -4px; }
+    @media (hover: hover) and (pointer: fine) {
+      body.has-cursor, body.has-cursor * { cursor: none; }
+    }
     footer {
       display: flex;
       justify-content: center;
@@ -50,7 +109,11 @@
 </head>
 <body>
   <main>
-    <img src="assets/under-construction.png" alt="Under construction">
+    <img id="lettering" src="assets/under-construction.png" alt="Under construction">
+    <button class="replay" type="button" id="replay">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      replay!
+    </button>
   </main>
   <footer>
     <a href="https://github.com/sophieli08" target="_blank" rel="noopener" aria-label="GitHub">
@@ -63,5 +126,60 @@
       <svg class="logo linkedin" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 512 509.64"><rect width="512" height="509.64" rx="115.61" ry="115.61"/><path class="cutout" d="M204.97 197.54h64.69v33.16h.94c9.01-16.16 31.04-33.16 63.89-33.16 68.31 0 80.94 42.51 80.94 97.81v116.92h-67.46l-.01-104.13c0-23.81-.49-54.45-35.08-54.45-35.12 0-40.51 25.91-40.51 52.72v105.86h-67.4V197.54zm-38.23-65.09c0 19.36-15.72 35.08-35.08 35.08-19.37 0-35.09-15.72-35.09-35.08 0-19.37 15.72-35.08 35.09-35.08 19.36 0 35.08 15.71 35.08 35.08zm-70.17 65.09h70.17v214.73H96.57V197.54z"/></svg>
     </a>
   </footer>
+  <script>
+    // An animated PNG only restarts when it's loaded under a new URL, so replay
+    // swaps in a fresh blob URL of the already-downloaded file (no re-download).
+    const img = document.getElementById('lettering');
+    const src = img.getAttribute('src');
+    let blob = null;
+    let blobUrl = null;
+    fetch(src).then(r => r.blob()).then(b => { blob = b; }).catch(() => {});
+
+    const replay = document.getElementById('replay');
+    replay.addEventListener('click', () => {
+      replay.classList.remove('spin');
+      void replay.offsetWidth;  // restart the icon spin
+      replay.classList.add('spin');
+      if (blob) {
+        if (blobUrl) URL.revokeObjectURL(blobUrl);
+        blobUrl = URL.createObjectURL(blob);
+        img.src = blobUrl;
+      } else {
+        img.src = src + '?replay=' + Date.now();  // fallback, e.g. when opened as a local file
+      }
+    });
+
+    // Custom cursor (mouse/trackpad only; touch devices keep their normal behavior)
+    if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      const dot = document.createElement('div');
+      dot.className = 'cursor';
+      document.body.appendChild(dot);
+      document.body.classList.add('has-cursor');
+
+      const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let mouseX = 0, mouseY = 0, dotX = 0, dotY = 0;
+
+      addEventListener('mousemove', e => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        if (!dot.classList.contains('visible')) {
+          dotX = mouseX; dotY = mouseY;
+          dot.classList.add('visible');
+        }
+        dot.classList.toggle('hover', !!e.target.closest('a, button'));
+      });
+      document.addEventListener('mouseleave', () => dot.classList.remove('visible'));
+      addEventListener('mousedown', () => dot.classList.add('down'));
+      addEventListener('mouseup', () => dot.classList.remove('down'));
+
+      (function follow() {
+        const ease = reduceMotion ? 1 : 0.2;  // lower = more trailing
+        dotX += (mouseX - dotX) * ease;
+        dotY += (mouseY - dotY) * ease;
+        dot.style.transform = `translate(${dotX}px, ${dotY}px)`;
+        requestAnimationFrame(follow);
+      })();
+    }
+  </script>
 </body>
 </html>
