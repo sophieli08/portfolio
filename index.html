@@ -30,13 +30,7 @@
     .home { display: block; }
     .home img { display: block; width: 48px; height: 48px; margin: -4px; }  /* logo art has a little built-in padding */
     .intro-wrap { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
-    .hello {
-      font-size: 44px;
-      line-height: 1.05;
-      font-weight: 800;
-      letter-spacing: -0.01em;
-    }
-    .last { font-weight: 400; }
+    .hello img { display: block; width: 210px; height: auto; margin-left: -4px; }  /* hand-lettered name */
     .intro { max-width: 260px; font-size: 14px; line-height: 19px; font-style: italic; }
     .intro b { font-weight: 700; }
     main {
@@ -166,10 +160,8 @@
 <body>
   <header>
     <div class="intro-wrap">
-      <h1 class="hello">
-        sophie <span class="last">li</span>
-      </h1>
-      <p class="intro">hi! i'm <b>sophie</b>, a freshman studying cs&nbsp;+&nbsp;design @ penn interested in everything <b>design &amp; dev</b>.</p>
+      <h1 class="hello"><img src="assets/name.png" alt="sophie li"></h1>
+      <p class="intro">hi! i'm sophie, a freshman studying <b>cs&nbsp;+&nbsp;design</b> @ <b>penn</b> interested in everything design &amp; dev.</p>
     </div>
     <div class="now-playing"></div>  <!-- filled by assets/js/spotify.js -->
   </header>
