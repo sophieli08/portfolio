@@ -21,7 +21,7 @@
     header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;     /* name and record both hug their top corners */
       gap: 16px;
       padding: 20px 28px 0;
       font-family: "SF Pro Text", "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
@@ -118,7 +118,7 @@
     /* phones */
     @media (max-width: 640px) {
       /* top: smaller name + intro, Spotify record lined up with the top */
-      header { align-items: flex-start; padding: 16px 16px 0; }
+      header { padding: 16px 16px 0; }
       .hello img { width: 140px; }
       .intro { font-size: 12px; line-height: 16px; max-width: 170px; }
       .intro-wrap { flex: none; }
