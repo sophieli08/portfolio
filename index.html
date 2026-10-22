@@ -105,7 +105,10 @@
       line-height: 18px;
       color: var(--logo);
     }
-    .home { justify-self: start; }
+    .corner { justify-self: start; display: flex; align-items: flex-end; gap: 12px; }
+    .clock { display: flex; flex-direction: column; }
+    .clock-time { font-weight: 700; font-variant-numeric: tabular-nums; }
+    .clock-place { font-style: italic; }
     .credit { justify-self: center; font-style: italic; text-align: center; }
     .socials {
       justify-self: end;
@@ -126,8 +129,8 @@
 
       /* bottom: stacked and centered - logo, then icons, then the progress */
       footer { grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 20px 16px; }
-      .home, .credit, .socials { justify-self: center; }
-      .home { order: -2; }
+      .corner, .credit, .socials { justify-self: center; }
+      .corner { order: -2; text-align: left; }
       .socials { order: -1; }
     }
     :root { --logo: #93abe3; --logo-hover: #6f8fd6; }
@@ -186,7 +189,13 @@
     </button>
   </main>
   <footer>
-    <a href="/" class="home" aria-label="Sophie Li, home"><img src="assets/logo.png" alt=""></a>
+    <div class="corner">
+      <a href="/" class="home" aria-label="Sophie Li, home"><img src="assets/logo.png" alt=""></a>
+      <div class="clock">
+        <time class="clock-time" id="clock"></time>
+        <span class="clock-place">philadelphia, pa / mclean, va</span>
+      </div>
+    </div>
     <div class="credit"><span>currently building with love ོ☼</span><span class="progress" data-percent="67"></span></div>
     <div class="socials">
     <a href="https://github.com/sophieli08" target="_blank" rel="noopener" aria-label="GitHub">
@@ -254,6 +263,15 @@
         img.src = src + '?replay=' + Date.now();  // fallback, e.g. when opened as a local file
       }
     });
+
+    // East coast clock in the footer, e.g. "3:42:07 pm et"
+    const clock = document.getElementById('clock');
+    const clockFormat = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit', second: '2-digit' });
+    function tick() {
+      clock.textContent = clockFormat.format(new Date()).toLowerCase() + ' et';
+      setTimeout(tick, 1000 - Date.now() % 1000);  // update right on the second
+    }
+    tick();
 
     // Custom cursor (mouse/trackpad only; touch devices keep their normal behavior).
     // Over a button or link it morphs into a rounded highlight around it, like the iPad pointer.
