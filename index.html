@@ -221,7 +221,7 @@
   <header>
     <div class="intro-wrap">
       <h1 class="hello"><img src="assets/name.png" alt="sophie li"></h1>
-      <p class="intro">hi! i'm sophie, a freshman @ <a href="https://www.engineering.upenn.edu/" target="_blank" rel="noopener"><em>penn</em></a> studying <em>cs&nbsp;+&nbsp;design</em>.</p>
+      <p class="intro">hi! i'm sophie, a freshman @ <a href="https://www.cis.upenn.edu/" target="_blank" rel="noopener"><em>penn</em></a>&nbsp;✎ studying <em>cs&nbsp;+&nbsp;design</em>.</p>
       <p class="intro"><em>interested in:</em> all things creative&nbsp;✦, &lt;dev&gt;, sunsets&nbsp;☀︎, stargazing&nbsp;<span class="star">★</span>, <a href="https://beliapp.co/app/sophielii" target="_blank" rel="noopener"><em>beli</em></a>&nbsp;☕︎, and calligraphy&nbsp;ᝰ</p>
     </div>
     <div class="now-playing"></div>  <!-- filled by assets/js/spotify.js -->
@@ -357,14 +357,20 @@
       (function frame() {
         let goal;
         if (target) {
-          const b = target.getBoundingClientRect();
+          // the Spotify record snaps to just its vinyl, as a circle; everything else gets a rounded box
+          const vinyl = target.classList.contains('record') && target.querySelector('.vinyl');
+          let b = (vinyl || target).getBoundingClientRect();
           const cx = b.left + b.width / 2, cy = b.top + b.height / 2;
+          if (vinyl) {  // the disc spins, which inflates its bounding box; use its real size around the same center
+            const size = vinyl.offsetWidth;
+            b = { left: cx - size / 2, top: cy - size / 2, width: size, height: size };
+          }
           goal = {
             x: b.left - PAD + (mouseX - cx) * PULL,
             y: b.top - PAD + (mouseY - cy) * PULL,
             w: b.width + PAD * 2,
             h: b.height + PAD * 2,
-            r: Math.min(14, (b.height + PAD * 2) / 2),
+            r: vinyl ? (b.height + PAD * 2) / 2 : Math.min(14, (b.height + PAD * 2) / 2),
           };
         } else {
           goal = { x: mouseX - DOT / 2, y: mouseY - DOT / 2, w: DOT, h: DOT, r: DOT / 2 };
