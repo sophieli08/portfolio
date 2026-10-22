@@ -1,0 +1,8 @@
+# secrets pulled by `vercel env pull` — never commit these
+.env
+.env*.local
+
+# local Vercel project link
+.vercel
+
+.DS_Store

@@ -33,9 +33,8 @@
 
   const track = document.createElement('div');
   track.className = 'track';
-  const plays = song.plays > 1 ? ` · ${song.plays} plays` : '';
   for (const [cls, text] of [
-    ['track-label', song.label + plays],
+    ['track-label', song.label],
     ['track-title', song.title],
     ['track-artist', song.artist],
   ]) {

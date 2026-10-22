@@ -67,7 +67,7 @@ module.exports = async (req, res) => {
       }
       let best = null;
       for (const c of counts.values()) if (!best || c.plays > best.plays) best = c;
-      song = toSong(best.track, { plays: best.plays, label: "today's top song" });
+      song = toSong(best.track, { plays: best.plays, label: 'on repeat' });
     } else {
       song = toSong(items[0].track, { plays: 0, label: 'last played' });
     }
