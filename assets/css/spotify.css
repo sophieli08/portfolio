@@ -59,9 +59,6 @@
 .track-title { font-weight: 700; font-size: 14px; line-height: 18px; }
 .track-artist { font-size: 13px; line-height: 16px; font-style: italic; }
 
-@media (prefers-color-scheme: dark) {
-  .vinyl::after { background: #121212; }
-}
 @media (prefers-reduced-motion: reduce) {
   .vinyl { animation: none; }
 }
