@@ -62,8 +62,6 @@
       padding: 20px 28px 0;
       color: var(--logo);
     }
-    .home { display: block; }
-    .home img { display: block; width: 48px; height: 48px; margin: -4px; }  /* logo art has a little built-in padding */
     .intro-wrap { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
     .hello img { display: block; width: 210px; height: auto; margin-left: -4px; }  /* hand-lettered name */
     .intro { max-width: 360px; font-size: var(--text); line-height: var(--text-lh); }
@@ -145,7 +143,7 @@
       grid-template-columns: 1fr auto 1fr;
       align-items: end;            /* everything sits on one shared bottom line */
       gap: 16px;
-      padding: 24px 32px;
+      padding: 24px 28px;          /* same side margin as the header, so the edges line up */
       font-size: var(--text);
       line-height: var(--text-lh);
       color: var(--logo);
@@ -177,7 +175,7 @@
 
       /* bottom: one compact row hugging the bottom edge - clock on the left, icons on the right */
       footer { grid-template-columns: 1fr auto; align-items: end; padding: 0 16px 10px; }
-      .credit, footer .home { display: none; }  /* no room for the progress or the logo on a phone */
+      .credit { display: none; }  /* no room for the progress on a phone */
       .clock-place { opacity: 0.8; }
       .socials { gap: 10px; margin-bottom: 3px; }  /* icon bottoms sit on the text baseline */
     }
@@ -224,7 +222,7 @@
     <div class="intro-wrap">
       <h1 class="hello"><img src="assets/name.png" alt="sophie li"></h1>
       <p class="intro">hi! i'm sophie, a freshman @ <a href="https://www.engineering.upenn.edu/" target="_blank" rel="noopener"><em>penn</em></a> studying <em>cs&nbsp;+&nbsp;design</em>.</p>
-      <p class="intro"><em>interested in:</em> all things creative&nbsp;✦, tech&nbsp;⌘, sunsets&nbsp;☀︎, stargazing&nbsp;<span class="star">★</span>, <a href="https://beliapp.co/app/sophielii" target="_blank" rel="noopener"><em>beli</em></a>&nbsp;☕︎, and calligraphy&nbsp;ᝰ</p>
+      <p class="intro"><em>interested in:</em> all things creative&nbsp;✦, &lt;dev&gt;, sunsets&nbsp;☀︎, stargazing&nbsp;<span class="star">★</span>, <a href="https://beliapp.co/app/sophielii" target="_blank" rel="noopener"><em>beli</em></a>&nbsp;☕︎, and calligraphy&nbsp;ᝰ</p>
     </div>
     <div class="now-playing"></div>  <!-- filled by assets/js/spotify.js -->
   </header>
@@ -241,7 +239,6 @@
   </main>
   <footer>
     <div class="corner">
-      <a href="/" class="home" aria-label="Sophie Li, home"><img src="assets/logo.png" alt=""></a>
       <div class="clock">
         <time class="clock-time" id="clock"></time>
         <span class="clock-place">philadelphia,&nbsp;pa / mclean,&nbsp;va</span>
