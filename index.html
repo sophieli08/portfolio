@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="only light">  <!-- light only; stops browsers from auto-darkening it -->
   <title>Sophie Li</title>
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png">
@@ -12,12 +13,40 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
+      position: relative;          /* the header and footer are placed against the whole page */
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       background: #fff;
       font-family: system-ui, -apple-system, sans-serif;
     }
+    /* soft glows in the top-right and bottom-left corners: a blurred wash of the logo colors
+       that fades into the page, drawn on fixed layers so they stay put behind everything */
+    body::before, body::after {
+      content: "";
+      position: fixed;
+      top: -32vh;
+      right: -14vw;
+      width: 62vw;
+      height: 58vh;
+      z-index: -1;
+      pointer-events: none;
+      border-radius: 50%;
+      background: linear-gradient(205deg, #93abe3 15%, #ccd0f8 50%, #e8dff6 85%);
+      filter: blur(60px);
+      opacity: 0.32;
+    }
+    body::after {  /* the same glow, mirrored into the bottom-left corner */
+      top: auto;
+      right: auto;
+      bottom: -32vh;
+      left: -14vw;
+      transform: rotate(180deg);
+    }
+    /* the header and footer float over the page so the lettering centers on the whole window */
+    header, footer { position: absolute; left: 0; right: 0; }
+    header { top: 0; }
+    footer { bottom: 0; }
     header {
       display: flex;
       justify-content: space-between;
@@ -34,21 +63,22 @@
     .intro { max-width: 260px; font-size: 14px; line-height: 19px; font-style: italic; }
     .intro b { font-weight: 700; }
     main {
-      flex: 1;
+      min-height: 100vh;
+      padding: 140px 0;            /* equal room top and bottom keeps it centered and clear of the header/footer */
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 16px;
+      gap: 4px;
     }
+    main picture { display: block; width: 100%; }
     main img { width: 100%; height: auto; display: block; }
     .replay {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      margin-top: 40px;
+      gap: 5px;
       font-family: "SF Pro Text", "SF Pro", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-      font-size: 15px;
+      font-size: 12px;
       font-weight: 700;
       font-style: italic;
       text-transform: lowercase;
@@ -64,8 +94,8 @@
     .replay.waiting { opacity: 0; visibility: hidden; }
     .replay { transition: color 0.2s, opacity 0.2s ease, visibility 0.2s; }
     .replay svg {
-      width: 15px;
-      height: 15px;
+      width: 12px;
+      height: 12px;
       stroke: currentColor;
       fill: none;
       stroke-width: 2.5;
@@ -127,11 +157,11 @@
       .intro-wrap { flex: none; }
       .now-playing { min-width: 0; }
 
-      /* bottom: stacked and centered - logo, then icons, then the progress */
-      footer { grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 20px 16px; }
-      .corner, .credit, .socials { justify-self: center; }
-      .corner { order: -2; text-align: left; }
-      .socials { order: -1; }
+      /* bottom: one compact row hugging the bottom edge - clock on the left, icons on the right */
+      footer { grid-template-columns: 1fr auto; align-items: end; padding: 0 16px 10px; font-size: 12px; line-height: 15px; }
+      .credit, footer .home { display: none; }  /* no room for the progress or the logo on a phone */
+      .clock-place { opacity: 0.8; }
+      .socials { gap: 10px; margin-bottom: 3px; }  /* icon bottoms sit on the text baseline */
     }
     :root { --logo: #93abe3; --logo-hover: #6f8fd6; }
     .logo {
@@ -161,16 +191,14 @@
       transition: stroke 0.2s;
     }
     footer a:hover .logo.mail { fill: none; stroke: var(--logo-hover); }
+    /* phones: smaller icons so they fit on the same row as the clock */
+    @media (max-width: 640px) {
+      .logo, .logo.linkedin { width: 17px; height: 17px; }
+      .logo.github { width: 18px; height: 18px; }
+      .logo.mail { width: 24px; height: 24px; margin: -3.5px -2.2px -6.5px; }  /* trims the envelope's empty box so its bottom edge lines up too */
+    }
     .cutout { fill: #fff; }
 
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --logo: #ccd0f8; --logo-hover: #ffffff;
-        --cursor: rgba(204, 208, 248, 0.45); --cursor-snap: rgba(204, 208, 248, 0.14);  /* --logo #ccd0f8 */
-      }
-      body { background: #121212; }
-      .cutout { fill: #121212; }
-    }
   </style>
 </head>
 <body>
@@ -182,7 +210,11 @@
     <div class="now-playing"></div>  <!-- filled by assets/js/spotify.js -->
   </header>
   <main>
-    <img id="lettering" src="assets/under-construction.png" alt="Under construction">
+    <picture>
+      <!-- phones: "under" stacked on "construction" so the words can be bigger (scripts/stack-lettering.py) -->
+      <source media="(max-width: 640px)" srcset="assets/under-construction-stacked.png">
+      <img id="lettering" src="assets/under-construction.png" alt="Under construction">
+    </picture>
     <button class="replay waiting" type="button" id="replay">
       replay!
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
@@ -216,7 +248,7 @@
     // An animated PNG only restarts when it's loaded under a new URL, so replay
     // swaps in a fresh blob URL of the already-downloaded file (no re-download).
     const img = document.getElementById('lettering');
-    const src = img.getAttribute('src');
+    const sources = img.parentElement.querySelectorAll('source');
     let blob = null;
     let blobUrl = null;
     const replay = document.getElementById('replay');
@@ -241,7 +273,8 @@
     // Show the replay button once the first play has finished (it stays visible after that)
     const loaded = img.complete ? Promise.resolve() : new Promise(r => img.addEventListener('load', r, { once: true }));
     const startedAt = loaded.then(() => performance.now());
-    const length = fetch(src)
+    const src = loaded.then(() => img.currentSrc);  // the wide or the stacked (phone) version
+    const length = src.then(fetch)
       .then(r => r.blob())
       .then(b => { blob = b; return b.arrayBuffer(); })
       .then(playLength)
@@ -251,24 +284,26 @@
       setTimeout(() => replay.classList.remove('waiting'), wait);
     });
 
-    replay.addEventListener('click', () => {
+    replay.addEventListener('click', async () => {
       replay.classList.remove('spin');
       void replay.offsetWidth;  // restart the icon spin
       replay.classList.add('spin');
+      let url;
       if (blob) {
         if (blobUrl) URL.revokeObjectURL(blobUrl);
-        blobUrl = URL.createObjectURL(blob);
-        img.src = blobUrl;
+        url = blobUrl = URL.createObjectURL(blob);
       } else {
-        img.src = src + '?replay=' + Date.now();  // fallback, e.g. when opened as a local file
+        url = (await src) + '?replay=' + Date.now();  // fallback, e.g. when opened as a local file
       }
+      sources.forEach(s => { s.srcset = url; });  // a matching <source> wins over img.src
+      img.src = url;
     });
 
-    // East coast clock in the footer, e.g. "3:42:07 pm et"
+    // East coast clock in the footer, e.g. "3:42:07 pm"
     const clock = document.getElementById('clock');
     const clockFormat = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit', second: '2-digit' });
     function tick() {
-      clock.textContent = clockFormat.format(new Date()).toLowerCase() + ' et';
+      clock.textContent = clockFormat.format(new Date()).toLowerCase();
       setTimeout(tick, 1000 - Date.now() % 1000);  // update right on the second
     }
     tick();
