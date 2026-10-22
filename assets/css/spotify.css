@@ -69,3 +69,14 @@
 /* in the top-right corner: text on the left, disc on the outer edge */
 header .record { flex-direction: row-reverse; text-align: right; }
 header .track { align-items: flex-end; }
+
+/* phones: a smaller record so it fits beside the name */
+@media (max-width: 640px) {
+  .vinyl { width: 40px; height: 40px; }
+  .record { gap: 8px; }
+  .track { min-width: 0; }
+  .track-title, .track-artist { max-width: 110px; }
+  .track-title { font-size: 12px; line-height: 15px; }
+  .track-artist { font-size: 11px; line-height: 14px; }
+  .track-label { font-size: 10px; line-height: 13px; }
+}

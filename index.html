@@ -60,6 +60,9 @@
       transition: color 0.2s;
     }
     .replay:hover { color: var(--logo-hover); }
+    /* hidden (but keeping its space) until the first play of the lettering finishes */
+    .replay.waiting { opacity: 0; visibility: hidden; }
+    .replay { transition: color 0.2s, opacity 0.2s ease, visibility 0.2s; }
     .replay svg {
       width: 15px;
       height: 15px;
@@ -112,9 +115,19 @@
       margin-bottom: 4px;          /* icons rest on the text baseline, not below it */
     }
     /* phones: stack the three parts, centered */
+    /* phones */
     @media (max-width: 640px) {
-      footer { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+      /* top: smaller name + intro, Spotify record lined up with the top */
+      header { align-items: flex-start; padding: 16px 16px 0; }
+      .hello img { width: 140px; }
+      .intro { font-size: 12px; line-height: 16px; max-width: 170px; }
+      .intro-wrap { flex: none; }
+      .now-playing { min-width: 0; }
+
+      /* bottom: stacked and centered - logo, then icons, then the progress */
+      footer { grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 20px 16px; }
       .home, .credit, .socials { justify-self: center; }
+      .home { order: -2; }
       .socials { order: -1; }
     }
     :root { --logo: #93abe3; --logo-hover: #6f8fd6; }
@@ -167,7 +180,7 @@
   </header>
   <main>
     <img id="lettering" src="assets/under-construction.png" alt="Under construction">
-    <button class="replay" type="button" id="replay">
+    <button class="replay waiting" type="button" id="replay">
       replay!
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
     </button>
@@ -197,9 +210,38 @@
     const src = img.getAttribute('src');
     let blob = null;
     let blobUrl = null;
-    fetch(src).then(r => r.blob()).then(b => { blob = b; }).catch(() => {});
-
     const replay = document.getElementById('replay');
+
+    // How long the animation plays (until its final frame), read from the APNG's own
+    // frame delays (fcTL chunks), so this stays right if the animation changes.
+    function playLength(buffer) {
+      const v = new DataView(buffer);
+      const delays = [];
+      for (let pos = 8; pos + 8 <= v.byteLength; ) {
+        const len = v.getUint32(pos);
+        const type = String.fromCharCode(v.getUint8(pos + 4), v.getUint8(pos + 5), v.getUint8(pos + 6), v.getUint8(pos + 7));
+        if (type === 'fcTL') {
+          const num = v.getUint16(pos + 8 + 20), den = v.getUint16(pos + 8 + 22) || 100;
+          delays.push(1000 * num / den);
+        }
+        pos += 12 + len;
+      }
+      return delays.slice(0, -1).reduce((a, b) => a + b, 0);  // the last frame just holds
+    }
+
+    // Show the replay button once the first play has finished (it stays visible after that)
+    const loaded = img.complete ? Promise.resolve() : new Promise(r => img.addEventListener('load', r, { once: true }));
+    const startedAt = loaded.then(() => performance.now());
+    const length = fetch(src)
+      .then(r => r.blob())
+      .then(b => { blob = b; return b.arrayBuffer(); })
+      .then(playLength)
+      .catch(() => 3000);  // e.g. opened as a local file: use the usual length
+    Promise.all([startedAt, length]).then(([t0, ms]) => {
+      const wait = Math.max(ms - (performance.now() - t0), 0);
+      setTimeout(() => replay.classList.remove('waiting'), wait);
+    });
+
     replay.addEventListener('click', () => {
       replay.classList.remove('spin');
       void replay.offsetWidth;  // restart the icon spin
