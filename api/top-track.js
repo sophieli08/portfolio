@@ -72,8 +72,8 @@ module.exports = async (req, res) => {
       song = toSong(items[0].track, { plays: 0, label: 'last played' });
     }
 
-    // let Vercel's CDN cache it for 5 minutes so Spotify isn't hit on every visit
-    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
+    // let Vercel's CDN cache it for 1 minute so Spotify isn't hit on every visit
+    res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=120');
     res.status(200).json(song);
   } catch (err) {
     console.error(err);
