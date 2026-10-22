@@ -18,7 +18,7 @@
   const fill = el.querySelector('.progress-fill');
   const pct = el.querySelector('.progress-pct');
 
-  let shown = 0;   // number currently displayed
+  let shown = 0;       // number currently displayed
   let raf = null;
   let done = null;
 
@@ -26,17 +26,16 @@
     fill.style.width = value + '%';
     el.setAttribute('aria-valuenow', String(value));
     cancelAnimationFrame(raf);
+    clearTimeout(done);
     if (reduceMotion) { shown = value; pct.textContent = value + '%'; return; }
     const from = shown, start = performance.now();
     (function tick(now) {
       const t = Math.min(Math.max((now - start) / duration, 0), 1);
-      const eased = 1 - Math.pow(1 - t, 3);  // ease-out
-      shown = Math.round(from + (value - from) * eased);
+      shown = Math.round(from + (value - from) * t);  // steady count, like a loading screen
       pct.textContent = shown + '%';
       if (t < 1) raf = requestAnimationFrame(tick);
     })(start);
     // safety net: land on the final number even if animation frames are paused
-    clearTimeout(done);
     done = setTimeout(() => {
       cancelAnimationFrame(raf);
       shown = value;
