@@ -44,7 +44,7 @@
   border-radius: 50%;
   background: #fff;
 }
-.record:hover .vinyl { animation-duration: 1.6s; }  /* spins faster on hover */
+.vinyl:hover { animation-duration: 1.6s; }  /* spins faster on hover */
 @keyframes vinyl-spin { to { transform: rotate(360deg); } }
 
 .track { display: flex; flex-direction: column; min-width: 0; }

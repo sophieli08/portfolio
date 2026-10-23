@@ -15,15 +15,16 @@
   }
   if (!song || !song.title) return;
 
-  const record = document.createElement('a');
+  const record = document.createElement('div');
   record.className = 'record';
-  record.href = song.url;
-  record.target = '_blank';
-  record.rel = 'noopener';
-  record.setAttribute('aria-label', `${song.label}: ${song.title} by ${song.artist}, on Spotify`);
 
-  const vinyl = document.createElement('div');
+  // only the disc is the link to the song; the text next to it is just text
+  const vinyl = document.createElement('a');
   vinyl.className = 'vinyl';
+  vinyl.href = song.url;
+  vinyl.target = '_blank';
+  vinyl.rel = 'noopener';
+  vinyl.setAttribute('aria-label', `${song.label}: ${song.title} by ${song.artist}, on Spotify`);
   if (song.art) {
     const art = document.createElement('img');
     art.src = song.art;
