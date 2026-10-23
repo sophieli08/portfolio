@@ -133,6 +133,7 @@
       z-index: 1000;
       opacity: 0;
       transition: opacity 0.2s ease, background-color 0.2s ease;
+      will-change: transform;      /* keep it on its own layer so moving it is cheap */
     }
     .cursor.visible { opacity: 1; }
     .cursor.snapped { background: var(--cursor-snap); }
@@ -363,17 +364,21 @@
       const PAD = 8;          // space around a snapped element
       const PULL = 0.12;      // how much the highlight leans toward the pointer
       const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const ease = reduceMotion ? 1 : 0.22;  // lower = smoother/slower
+      // how much of the remaining distance to cover per 60fps frame (1 = instant): the free dot
+      // keeps up with the pointer almost exactly, snapping on/off a button glides a little
+      const FOLLOW = reduceMotion ? 1 : 0.75;  // position while free
+      const SNAP = reduceMotion ? 1 : 0.3;     // position while snapped, and all shape changes
 
       let mouseX = 0, mouseY = 0, target = null, pressed = false;
-      const cur = { x: 0, y: 0, w: DOT, h: DOT, r: DOT / 2 };
+      const cur = { cx: 0, cy: 0, w: DOT, h: DOT, r: DOT / 2 };  // tracked by center, so it morphs around the pointer
+      let last = performance.now();
 
       addEventListener('mousemove', e => {
         mouseX = e.clientX;
         mouseY = e.clientY;
         target = e.target.closest('a, button, .burrito');
         if (!dot.classList.contains('visible')) {
-          cur.x = mouseX - DOT / 2; cur.y = mouseY - DOT / 2;
+          cur.cx = mouseX; cur.cy = mouseY;
           dot.classList.add('visible');
         }
       });
@@ -381,7 +386,11 @@
       addEventListener('mousedown', () => { pressed = true; });
       addEventListener('mouseup', () => { pressed = false; });
 
-      (function frame() {
+      (function frame(now = performance.now()) {
+        // per-frame easing scaled by elapsed time, so it feels the same at 60Hz and 120Hz
+        const dt = Math.min(now - last, 100) / (1000 / 60);
+        last = now;
+        const step = base => 1 - Math.pow(1 - base, dt);
         let goal;
         if (target) {
           // the Spotify record snaps to just its vinyl, as a circle; everything else gets a rounded box
@@ -393,22 +402,24 @@
             b = { left: cx - size / 2, top: cy - size / 2, width: size, height: size };
           }
           goal = {
-            x: b.left - PAD + (mouseX - cx) * PULL,
-            y: b.top - PAD + (mouseY - cy) * PULL,
+            cx: cx + (mouseX - cx) * PULL,
+            cy: cy + (mouseY - cy) * PULL,
             w: b.width + PAD * 2,
             h: b.height + PAD * 2,
             r: vinyl ? (b.height + PAD * 2) / 2 : Math.min(14, (b.height + PAD * 2) / 2),
           };
         } else {
-          goal = { x: mouseX - DOT / 2, y: mouseY - DOT / 2, w: DOT, h: DOT, r: DOT / 2 };
+          goal = { cx: mouseX, cy: mouseY, w: DOT, h: DOT, r: DOT / 2 };
         }
         if (pressed) {  // squeeze slightly on click
           const k = 0.92;
-          goal.x += goal.w * (1 - k) / 2; goal.y += goal.h * (1 - k) / 2;
           goal.w *= k; goal.h *= k;
         }
-        for (const key in cur) cur[key] += (goal[key] - cur[key]) * ease;
-        dot.style.transform = `translate(${cur.x}px, ${cur.y}px)`;
+        const move = step(target ? SNAP : FOLLOW), morph = step(SNAP);
+        cur.cx += (goal.cx - cur.cx) * move;
+        cur.cy += (goal.cy - cur.cy) * move;
+        for (const key of ['w', 'h', 'r']) cur[key] += (goal[key] - cur[key]) * morph;
+        dot.style.transform = `translate(${cur.cx - cur.w / 2}px, ${cur.cy - cur.h / 2}px)`;
         dot.style.width = cur.w + 'px';
         dot.style.height = cur.h + 'px';
         dot.style.borderRadius = cur.r + 'px';
