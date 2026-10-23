@@ -377,6 +377,8 @@
         mouseX = e.clientX;
         mouseY = e.clientY;
         target = e.target.closest('a, button, .burrito');
+        // the Spotify record only snaps while the pointer is on the vinyl itself, not its text
+        if (target && target.classList.contains('record') && !e.target.closest('.vinyl')) target = null;
         if (!dot.classList.contains('visible')) {
           cur.cx = mouseX; cur.cy = mouseY;
           dot.classList.add('visible');
