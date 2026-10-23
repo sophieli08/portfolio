@@ -50,6 +50,8 @@
         radial-gradient(ellipse 52vw 46vh at 0% 100%,
           rgba(147, 171, 227, 0.40), rgba(204, 208, 248, 0.32) 40%, rgba(240, 221, 242, 0.18) 68%, rgba(240, 221, 242, 0) 100%);
     }
+    /* highlighted text: a soft wash of the logo color, with the text going a deeper blue */
+    ::selection { background: rgba(147, 171, 227, 0.28); color: var(--logo-hover); }
     /* the header and footer float over the page so the lettering centers on the whole window */
     header, footer { position: absolute; left: 0; right: 0; }
     header { top: 0; }
