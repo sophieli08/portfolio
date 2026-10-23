@@ -65,6 +65,7 @@
     .intro-wrap { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
     .hello img { display: block; width: 210px; height: auto; margin-left: -4px; }  /* hand-lettered name */
     .intro { max-width: 360px; font-size: var(--text); line-height: var(--text-lh); }
+    .intro-lead { white-space: nowrap; }  /* desktop: the first sentence stays on one line */
     .intro + .intro { margin-top: -6px; }  /* cancel the column gap so the intro lines are evenly spaced */
     .intro em { font-style: italic; }
     .intro .star { font-size: 0.8em; }  /* the solid star reads heavy at full size */
@@ -170,6 +171,7 @@
       .hello img { width: 140px; }
       :root { --text: 15px; --text-lh: 19px; }
       .intro { max-width: 190px; }
+      .intro-lead { white-space: normal; }  /* phones: let it wrap */
       .intro-wrap { flex: none; }
       .now-playing { min-width: 0; }
 
@@ -221,7 +223,7 @@
   <header>
     <div class="intro-wrap">
       <h1 class="hello"><img src="assets/name.png" alt="sophie li"></h1>
-      <p class="intro">hi! i'm sophie, a freshman @ <a href="https://www.cis.upenn.edu/" target="_blank" rel="noopener"><em>penn</em></a> studying <em>cs&nbsp;+&nbsp;design</em>&nbsp;✎</p>
+      <p class="intro intro-lead">hi! i'm sophie, a freshman @ <a href="https://www.cis.upenn.edu/" target="_blank" rel="noopener"><em>penn</em></a> studying <em>cs&nbsp;+&nbsp;design</em>&nbsp;✎</p>
       <p class="intro"><em>interested in:</em> all things creative&nbsp;✦, &lt;dev&gt;, sunsets&nbsp;☀︎, stargazing&nbsp;<span class="star">★</span>, <a href="https://beliapp.co/app/sophielii" target="_blank" rel="noopener"><em>beli</em></a>&nbsp;☕︎, and calligraphy&nbsp;ᝰ</p>
     </div>
     <div class="now-playing"></div>  <!-- filled by assets/js/spotify.js -->
