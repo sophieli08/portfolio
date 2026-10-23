@@ -1,0 +1,209 @@
+/* Shared styles for every page */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+/* typography: the hand-lettered calligraphy plus EB Garamond for everything else. The
+   script already slants, so the Garamond is mostly upright, with italics (never bold) for
+   emphasis, to contrast with the lettering instead of echoing it */
+:root { --serif: "EB Garamond", Garamond, "Times New Roman", serif; }
+/* one text size used everywhere (smaller on phones, see the phone section) */
+:root { --text: 17px; --text-lh: 22px; }
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  font-family: var(--serif);
+  font-variant-numeric: lining-nums;  /* Garamond's old-style figures bounce around; keep digits even */
+}
+/* soft glows in the top-right and bottom-left corners: radial washes of the logo colors
+   that fade into the page. Plain gradients, no blur filter, because Safari clips large
+   blurred shapes at the screen edge. The layer is fixed and as tall as the screen gets
+   with the toolbars hidden (lvh), so it also reaches behind the iPhone toolbar */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100lvh;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 52vw 46vh at 100% 0%,
+      rgba(147, 171, 227, 0.40), rgba(204, 208, 248, 0.32) 40%, rgba(240, 221, 242, 0.18) 68%, rgba(240, 221, 242, 0) 100%),
+    radial-gradient(ellipse 52vw 46vh at 0% 100%,
+      rgba(147, 171, 227, 0.40), rgba(204, 208, 248, 0.32) 40%, rgba(240, 221, 242, 0.18) 68%, rgba(240, 221, 242, 0) 100%);
+}
+/* highlighted text: a soft wash of the logo color, with the text going a deeper blue */
+::selection { background: rgba(147, 171, 227, 0.28); color: var(--logo-hover); }
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;     /* name and record both hug their top corners */
+  gap: 16px;
+  padding: 20px 28px 0;
+  color: var(--logo);
+}
+/* top right: the page links, with the Spotify record under them */
+.header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 18px; }
+.nav { display: flex; gap: 22px; font-size: var(--text); line-height: var(--text-lh); }
+.nav a { color: inherit; text-decoration: none; transition: color 0.2s; }
+.nav a:hover { color: var(--logo-hover); }
+.nav a[aria-current="page"] {  /* the page you're on: italic, with the same faint underline as the intro links */
+  font-style: italic;
+  text-decoration: underline;
+  text-decoration-color: var(--cursor);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.hello a { display: block; }   /* the name links home */
+.intro-wrap { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.hello img { display: block; width: 210px; height: auto; margin-left: -4px; }  /* hand-lettered name */
+.intro { max-width: 360px; font-size: var(--text); line-height: var(--text-lh); }
+.intro-lead { white-space: nowrap; }  /* desktop: the first sentence stays on one line */
+.intro + .intro { margin-top: -6px; }  /* cancel the column gap so the intro lines are evenly spaced */
+.intro em { font-style: italic; }
+.intro .star { font-size: 0.8em; }  /* the solid star reads heavy at full size */
+.intro a, .burrito i {  /* links in the intro (and the burrito blanket): same color, with a faint underline that darkens on hover */
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--cursor);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color 0.2s, text-decoration-color 0.2s;
+}
+.intro a:hover, .burrito:hover i { color: var(--logo-hover); text-decoration-color: currentColor; }
+main {
+  flex: 1;                     /* fills the space between the header and footer */
+  padding: 48px 28px;          /* same side margin as the header and footer */
+}
+
+/* custom cursor: a translucent dot in the logo color that snaps into a rounded highlight
+   around buttons and links, like the iPad pointer */
+:root { --cursor: rgba(147, 171, 227, 0.45); --cursor-snap: rgba(147, 171, 227, 0.16);  /* --logo #93abe3 */ }
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  background: var(--cursor);
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+  will-change: transform;      /* keep it on its own layer so moving it is cheap */
+}
+.cursor.visible { opacity: 1; }
+.cursor.snapped { background: var(--cursor-snap); }
+.cursor.text { background: rgba(147, 171, 227, 0.85); }  /* the thin text bar needs to be stronger to show */
+@media (hover: hover) and (pointer: fine) {
+  body.has-cursor, body.has-cursor * { cursor: none; }
+}
+footer {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;            /* everything sits on one shared bottom line */
+  gap: 16px;
+  padding: 24px 28px;          /* same side margin as the header, so the edges line up */
+  font-size: var(--text);
+  line-height: var(--text-lh);
+  color: var(--logo);
+}
+.corner { justify-self: start; display: flex; align-items: flex-end; gap: 12px; }
+.clock { display: flex; flex-direction: column; }
+.clock-time { font-variant-numeric: lining-nums tabular-nums; }
+.clock-place { font-style: italic; }
+/* the credit, with "last updated ..." under it (filled by assets/js/updated.js) */
+.credit { justify-self: center; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.credit i { font-style: italic; }
+.updated { display: block; min-height: var(--text-lh); opacity: 0; transition: opacity 0.6s ease; }  /* holds its row even before it loads */
+.updated.loaded { opacity: 1; }
+.updated a { color: inherit; text-decoration: none; transition: color 0.2s; }
+.updated a:hover { color: var(--logo-hover); }
+/* hovering "burrito blanket" pops up the photo: a rounded card (same corners as the cursor
+   highlight) that springs up out of the words. Desktop only; phones hide the credit */
+.burrito { position: relative; }
+.burrito-pic {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 16px);
+  width: 176px;
+  height: auto;
+  border-radius: 14px;
+  box-shadow: 0 0 0 1px var(--cursor-snap), 0 14px 34px rgba(60, 80, 150, 0.22);
+  opacity: 0;
+  transform: translateX(-50%) translateY(10px) scale(0.9) rotate(-3deg);
+  transform-origin: 50% 100%;
+  transition: opacity 0.22s ease, transform 0.45s cubic-bezier(0.34, 1.45, 0.64, 1);
+  pointer-events: none;
+}
+.burrito:hover .burrito-pic {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1) rotate(-2deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .burrito-pic { transition: opacity 0.2s ease; transform: translateX(-50%) rotate(-2deg); }
+}
+.credit .sun { padding-left: 0.6em; }  /* the little mark hangs left over the space, so add room */
+.socials {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-bottom: 4px;          /* icons rest on the text baseline, not below it */
+}
+/* phones */
+@media (max-width: 640px) {
+  /* top: smaller name + intro, Spotify record lined up with the top */
+  header { padding: 16px 16px 0; }
+  .hello img { width: 140px; }
+  :root { --text: 15px; --text-lh: 19px; }
+  .intro { max-width: 190px; }
+  .intro-lead { white-space: normal; }  /* phones: let it wrap */
+  .intro-wrap { flex: none; }
+  .now-playing { min-width: 0; }
+  .header-right { gap: 12px; }
+  .nav { gap: 14px; }
+  main { padding: 32px 16px; }
+
+  /* bottom: one compact row hugging the bottom edge - clock on the left, icons on the right */
+  footer { grid-template-columns: 1fr auto; align-items: end; padding: 0 16px 10px; }
+  .credit { display: none; }  /* no room for the credit on a phone */
+  .clock-place { opacity: 0.8; }
+  .socials { gap: 10px; margin-bottom: 3px; }  /* icon bottoms sit on the text baseline */
+}
+:root { --logo: #93abe3; --logo-hover: #6f8fd6; }
+.logo {
+  display: block;
+  width: 28px;
+  height: 28px;
+  fill: var(--logo);
+  transition: fill 0.2s;
+}
+footer a { display: block; }
+footer a:hover .logo { fill: var(--logo-hover); }
+/* optical sizing: circles look smaller and solid shapes look bigger than outlines */
+.logo.github { width: 30px; height: 30px; }
+.logo.linkedin { width: 28px; height: 28px; }
+/* optical sizing: the wide envelope is sized to the same visual area as the square
+   icons (so it's a bit shorter than them), with the same line weight as Instagram;
+   negative margins trim its empty box so the spacing stays even */
+.logo.mail {
+  width: 39px;
+  height: 39px;
+  margin: -5.4px -3.6px;
+  fill: none;
+  stroke: var(--logo);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.2s;
+}
+footer a:hover .logo.mail { fill: none; stroke: var(--logo-hover); }
+/* phones: smaller icons so they fit on the same row as the clock */
+@media (max-width: 640px) {
+  .logo, .logo.linkedin { width: 18px; height: 18px; }
+  .logo.github { width: 19px; height: 19px; }
+  .logo.mail { width: 25.5px; height: 25.5px; margin: -3.7px -2.3px -6.9px; }  /* trims the envelope's empty box so its bottom edge lines up too */
+}
+.cutout { fill: #fff; }
