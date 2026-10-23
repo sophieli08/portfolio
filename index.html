@@ -377,8 +377,6 @@
         mouseX = e.clientX;
         mouseY = e.clientY;
         target = e.target.closest('a, button, .burrito');
-        // the Spotify record only snaps while the pointer is on the vinyl itself, not its text
-        if (target && target.classList.contains('record') && !e.target.closest('.vinyl')) target = null;
         if (!dot.classList.contains('visible')) {
           cur.cx = mouseX; cur.cy = mouseY;
           dot.classList.add('visible');
@@ -395,12 +393,12 @@
         const step = base => 1 - Math.pow(1 - base, dt);
         let goal;
         if (target) {
-          // the Spotify record snaps to just its vinyl, as a circle; everything else gets a rounded box
-          const vinyl = target.classList.contains('record') && target.querySelector('.vinyl');
-          let b = (vinyl || target).getBoundingClientRect();
+          // the Spotify vinyl snaps as a circle; everything else gets a rounded box
+          const vinyl = target.classList.contains('vinyl');
+          let b = target.getBoundingClientRect();
           const cx = b.left + b.width / 2, cy = b.top + b.height / 2;
           if (vinyl) {  // the disc spins, which inflates its bounding box; use its real size around the same center
-            const size = vinyl.offsetWidth;
+            const size = target.offsetWidth;
             b = { left: cx - size / 2, top: cy - size / 2, width: size, height: size };
           }
           goal = {
